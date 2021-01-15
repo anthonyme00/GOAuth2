@@ -16,6 +16,10 @@ import (
 	"github.com/anthonyme00/GOAuth2/util"
 )
 
+// The connection data used to connect to Google's OAuth2 API.
+// ClientId and ClientSecret can be taken from your developer
+// dashboard.
+//
 // https://developers.google.com/identity/protocols/oauth2/scopes
 type OAuthAPIConnectionData struct {
 	ClientId     string
@@ -23,6 +27,7 @@ type OAuthAPIConnectionData struct {
 	Scopes       []string
 }
 
+// The Token data. Use the AccessToken to access Google Apps APIs.
 type OAuth2Token struct {
 	AccessToken    string  `json:"access_token"`
 	RefreshToken   string  `json:"refresh_token"`
@@ -34,6 +39,8 @@ type OAuth2Token struct {
 	ConnectionData OAuthAPIConnectionData
 }
 
+// Used to see if the Token is expired. You can use this with
+// Refresh() to refresh the token. Or just use GetAccessToken.
 func (token *OAuth2Token) IsExpired(expirationThreshold float64) bool {
 	currentTime := time.Now()
 
@@ -45,10 +52,12 @@ func (token *OAuth2Token) IsExpired(expirationThreshold float64) bool {
 	}
 }
 
+// Used to get scopes as a string slice.
 func (token *OAuth2Token) Scopes() []string {
 	return strings.Split(token.Scope, " ")
 }
 
+// Get the access token, refreshing it automatically if it is expired.
 func (token *OAuth2Token) GetAccessToken(expirationThreshold float64) string {
 	if token.IsExpired(expirationThreshold) == false {
 		return token.AccessToken
@@ -58,6 +67,7 @@ func (token *OAuth2Token) GetAccessToken(expirationThreshold float64) string {
 	}
 }
 
+// Call this to refresh the token.
 func (token *OAuth2Token) Refresh() {
 	refreshQuery := util.UrlQuery{
 		"client_id":     token.ConnectionData.ClientId,
@@ -78,6 +88,9 @@ func (token *OAuth2Token) Refresh() {
 	}
 }
 
+// Serialize the token to a byte slice.
+//
+// Use SerializeEncrypted for security.
 func (token *OAuth2Token) Serialize() ([]byte, error) {
 	buffer := bytes.Buffer{}
 	encoder := gob.NewEncoder(&buffer)
@@ -91,6 +104,9 @@ func (token *OAuth2Token) Serialize() ([]byte, error) {
 	}
 }
 
+// Serialize the token while encrypting it with a key.
+//
+// Key must be <= 32 bytes.
 func (token *OAuth2Token) SerializeEncrypted(key []byte) ([]byte, error) {
 	serializedToken, err := token.Serialize()
 	if err != nil {
@@ -105,6 +121,9 @@ func (token *OAuth2Token) SerializeEncrypted(key []byte) ([]byte, error) {
 	return encryptedToken, nil
 }
 
+// Deserialize the token.
+//
+// Use DeserializeEncrypted for safety.
 func (token *OAuth2Token) Deserialize(data []byte) error {
 	dataBuffer := bytes.NewBuffer(data)
 	decoder := gob.NewDecoder(dataBuffer)
@@ -117,6 +136,9 @@ func (token *OAuth2Token) Deserialize(data []byte) error {
 	}
 }
 
+// Serialize the token while encrypting it with a key.
+//
+// Key must be <= 32 bytes.
 func (token *OAuth2Token) DeserializeEncrypted(data []byte, key []byte) error {
 	decryptedToken, err := util.Decrypt(data, key)
 	if err != nil {
@@ -128,9 +150,10 @@ func (token *OAuth2Token) DeserializeEncrypted(data []byte, key []byte) error {
 	return nil
 }
 
-var OAuth2AuthEndpoint = "https://accounts.google.com/o/oauth2/v2/auth"
-var OAuth2TokenEndpoint = "https://oauth2.googleapis.com/token"
+const OAuth2AuthEndpoint = "https://accounts.google.com/o/oauth2/v2/auth"
+const OAuth2TokenEndpoint = "https://oauth2.googleapis.com/token"
 
+// Get an OAuth2 Token with the connection data specified
 func GetOAuth2Token(data OAuthAPIConnectionData) (*OAuth2Token, error) {
 	code_verifier := util.GenerateBase64URLnopadding(64)
 	code_challenge := util.GenerateSHA256(code_verifier)

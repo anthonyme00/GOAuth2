@@ -4,6 +4,7 @@ import "fmt"
 
 type UrlQuery map[string]string
 
+// Create a url query string.
 func (query *UrlQuery) CreateQuery() string {
 	querystring := "?"
 

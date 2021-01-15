@@ -13,6 +13,7 @@ import (
 
 var Base64URLNoPadding = base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString
 
+// Generate a random Base64 string that is url query safe.
 func GenerateBase64URLnopadding(length uint32) string {
 	randBytes := make([]byte, length)
 	_, err := rand.Read(randBytes)
@@ -23,11 +24,15 @@ func GenerateBase64URLnopadding(length uint32) string {
 	return Base64URLNoPadding(randBytes)
 }
 
+// Generate SHA256 hash.
 func GenerateSHA256(input string) [32]byte {
 	return sha256.Sum256([]byte(input))
 }
 
-//https://tutorialedge.net/golang/go-encrypt-decrypt-aes-tutorial/
+// Encrypt a byte slice with a key.
+//
+// Source:
+// https://tutorialedge.net/golang/go-encrypt-decrypt-aes-tutorial/
 func Encrypt(data []byte, key []byte) ([]byte, error) {
 	if len(key) > 32 {
 		return nil, errors.New("Key must be less than equal to 32 bytes!")
@@ -55,6 +60,10 @@ func Encrypt(data []byte, key []byte) ([]byte, error) {
 	return gcm.Seal(nonce, nonce, data, nil), nil
 }
 
+// Decrypt a byte slice with a key.
+//
+// Source:
+// https://tutorialedge.net/golang/go-encrypt-decrypt-aes-tutorial/
 func Decrypt(data []byte, key []byte) ([]byte, error) {
 	if len(key) > 32 {
 		return nil, errors.New("Key must be less than equal to 32 bytes!")

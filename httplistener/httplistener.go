@@ -22,6 +22,12 @@ type HTTPListener struct {
 
 type ListenerHandle chan *http.Request
 
+// Open a listener on a random port, calling a handler
+// function to handle the incoming request. returns a handle
+// for GetResponse.
+//
+// Usage:
+// listenerHandle := listener.OpenListener(httplistener.RedirectToURL("https://google.com/"))
 func (listener *HTTPListener) OpenListener(handler func(w http.ResponseWriter, req *http.Request)) ListenerHandle {
 	listener.port = util.GetRandomOpenPort()
 
@@ -42,6 +48,10 @@ func (listener *HTTPListener) OpenListener(handler func(w http.ResponseWriter, r
 	return handle
 }
 
+// Get response from a handle (Blocking).
+//
+// Usage:
+// req := listener.GetResponse(listenerHandle)
 func (listener *HTTPListener) GetResponse(handle ListenerHandle) *http.Request {
 	req := <-handle
 	listener.server.Close()
@@ -50,10 +60,12 @@ func (listener *HTTPListener) GetResponse(handle ListenerHandle) *http.Request {
 
 var OpenInBrowser = util.OpenInBrowser
 
+// Get URL of the listener. Useful for getting redirect url.
 func (listener *HTTPListener) GetUrl() string {
 	return fmt.Sprintf("http://127.0.0.1:%d/", listener.port)
 }
 
+// A handler for redirecting page to a url.
 func RedirectToURL(url string) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		http.Redirect(w, req, "http://google.com/", 300)
