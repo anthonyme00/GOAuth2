@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func main() {
+func RunSample() {
 	key := []byte("SUPER_SECRET_KEY")
 
 	//Create Token
