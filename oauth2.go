@@ -41,6 +41,10 @@ type OAuth2Token struct {
 
 // Used to see if the Token is expired. You can use this with
 // Refresh() to refresh the token. Or just use GetAccessToken.
+//
+// expirationThreshold - Threshold before actual expiration in seconds
+// after which the token will count as being expired, even if not actually
+// expired
 func (token *OAuth2Token) IsExpired(expirationThreshold float64) bool {
 	currentTime := time.Now()
 
@@ -58,6 +62,10 @@ func (token *OAuth2Token) Scopes() []string {
 }
 
 // Get the access token, refreshing it automatically if it is expired.
+//
+// expirationThreshold - Threshold before actual expiration in seconds
+// after which the token will count as being expired, even if not actually
+// expired
 func (token *OAuth2Token) GetAccessToken(expirationThreshold float64) string {
 	if token.IsExpired(expirationThreshold) == false {
 		return token.AccessToken
@@ -136,7 +144,7 @@ func (token *OAuth2Token) Deserialize(data []byte) error {
 	}
 }
 
-// Serialize the token while encrypting it with a key.
+// Deserialize the encrypted token with a key.
 //
 // Key must be <= 32 bytes.
 func (token *OAuth2Token) DeserializeEncrypted(data []byte, key []byte) error {
@@ -155,7 +163,7 @@ const OAuth2TokenEndpoint = "https://oauth2.googleapis.com/token"
 
 // Get an OAuth2 Token with the connection data specified
 func GetOAuth2Token(data OAuthAPIConnectionData) (*OAuth2Token, error) {
-	code_verifier := util.GenerateBase64URLnopadding(64)
+	code_verifier := util.GenerateBase64URLNoPadding(64)
 	code_challenge := util.GenerateSHA256(code_verifier)
 
 	authorizationListener := httplistener.HTTPListener{}

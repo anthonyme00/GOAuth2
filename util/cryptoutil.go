@@ -14,7 +14,7 @@ import (
 var Base64URLNoPadding = base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString
 
 // Generate a random Base64 string that is url query safe.
-func GenerateBase64URLnopadding(length uint32) string {
+func GenerateBase64URLNoPadding(length uint32) string {
 	randBytes := make([]byte, length)
 	_, err := rand.Read(randBytes)
 	if err != nil {
