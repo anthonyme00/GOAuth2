@@ -4,9 +4,9 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/anthonyme00/GOAuth2.svg)](https://pkg.go.dev/github.com/anthonyme00/GOAuth2)
 [![Coverage Status](https://coveralls.io/repos/github/anthonyme00/GOAuth2/badge.svg?branch=master)](https://coveralls.io/github/anthonyme00/GOAuth2?branch=master)
 
-A simple gog library for getting Google OAuth2 token 
+A simple go library for getting Google OAuth2 token 
 
-example usage:
+Example usage:
 
 ```
 package main
