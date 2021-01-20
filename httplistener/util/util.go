@@ -26,7 +26,7 @@ func GetRandomOpenPort() int {
 //
 // Source:
 // https://gist.github.com/nanmu42/4fbaf26c771da58095fa7a9f14f23d27
-func OpenInBrowser(url string) {
+func OpenInBrowser(url string) error {
 	var err error
 
 	switch runtime.GOOS {
@@ -42,4 +42,6 @@ func OpenInBrowser(url string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	return err
 }
